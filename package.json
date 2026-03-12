@@ -6,7 +6,7 @@
     "dev:app": "npm --prefix convertidor run dev",
     "dev:analytics": "npm --prefix convertidor/analytics-service run dev",
     "dev:receipt": "npm --prefix convertidor/receipt-service run dev",
-    "build": "npm --prefix convertidor run build",
+    "build": "npm --prefix convertidor ci && npm --prefix convertidor run build",
     "start": "npm --prefix convertidor run start",
     "lint": "npm --prefix convertidor run lint",
     "typecheck": "npm --prefix convertidor run typecheck",
