@@ -4,8 +4,8 @@
   "scripts": {
     "dev": "npm --prefix convertidor run dev",
     "dev:app": "npm --prefix convertidor run dev",
-    "dev:analytics": "npm --prefix analytics-service run dev",
-    "dev:receipt": "npm --prefix receipt-service run dev",
+    "dev:analytics": "npm --prefix convertidor/analytics-service run dev",
+    "dev:receipt": "npm --prefix convertidor/receipt-service run dev",
     "build": "npm --prefix convertidor run build",
     "start": "npm --prefix convertidor run start",
     "lint": "npm --prefix convertidor run lint",
