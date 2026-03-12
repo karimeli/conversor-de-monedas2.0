@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const pdfBuffer = await receiptResponse.arrayBuffer();
+    const pdfBuffer = new Uint8Array(await receiptResponse.arrayBuffer());
 
     return new NextResponse(pdfBuffer, {
       headers: {

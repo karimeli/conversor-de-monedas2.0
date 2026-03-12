@@ -29,6 +29,7 @@ export default function Home() {
     timestamp: string;
   } | null>(null);
   const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRates = async () => {
@@ -97,6 +98,7 @@ export default function Home() {
       );
 
       setReceiptData(data.transaccion);
+      setReceiptError(null);
     } catch {
       setResultadoStr(
         <p className="text-red-600">
@@ -113,6 +115,7 @@ export default function Home() {
     if (!receiptData) return;
 
     setIsDownloadingReceipt(true);
+    setReceiptError(null);
 
     try {
       const res = await fetch("/api/receipt", {
@@ -125,6 +128,11 @@ export default function Home() {
 
       if (!res.ok) throw new Error("No se pudo generar el comprobante");
 
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/pdf")) {
+        throw new Error("El servidor no devolvio un PDF");
+      }
+
       const pdfBlob = await res.blob();
       const url = window.URL.createObjectURL(pdfBlob);
       const link = document.createElement("a");
@@ -134,6 +142,8 @@ export default function Home() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+    } catch {
+      setReceiptError("No se pudo descargar el PDF. Verifica que el microservicio de comprobantes este activo.");
     } finally {
       setIsDownloadingReceipt(false);
     }
@@ -248,6 +258,12 @@ export default function Home() {
                   >
                     {isDownloadingReceipt ? "Generando PDF..." : "Descargar comprobante PDF"}
                   </button>
+                )}
+
+                {receiptError && (
+                  <p className="mt-3 text-sm font-medium text-red-600">
+                    {receiptError}
+                  </p>
                 )}
               </div>
             )}
