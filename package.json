@@ -1,0 +1,12 @@
+{
+  "name": "conversor-de-monedas-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix convertidor run dev",
+    "build": "npm --prefix convertidor run build",
+    "start": "npm --prefix convertidor run start",
+    "lint": "npm --prefix convertidor run lint",
+    "typecheck": "npm --prefix convertidor run typecheck",
+    "check": "npm --prefix convertidor run check"
+  }
+}

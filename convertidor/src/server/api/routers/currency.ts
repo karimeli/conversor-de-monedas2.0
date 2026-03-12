@@ -1,4 +1,3 @@
-// src/server/api/routers/currency.ts
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
@@ -34,7 +33,7 @@ export const currencyRouter = createTRPCRouter({
       const { origen, destino, cantidad } = input;
       const apiUrl = process.env.EXCHANGE_API_URL;
       if (!apiUrl) throw new Error("EXCHANGE_API_URL is not defined in .env");
-      
+
       const res = await fetch(apiUrl, {
         next: { revalidate: 3600 }
       });
@@ -54,7 +53,7 @@ export const currencyRouter = createTRPCRouter({
       const finalResult = amountInUSD * rateDestino;
 
       return {
-        resultado: finalResult.toFixed(2)
+        resultado: finalResult,
       };
     }),
 });
