@@ -20,6 +20,15 @@ export default function Home() {
   const [rates, setRates] = useState<Record<string, number> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConverting, setIsConverting] = useState(false);
+  const [receiptData, setReceiptData] = useState<{
+    id: string;
+    origen: string;
+    destino: string;
+    cantidad: number;
+    resultado: number;
+    timestamp: string;
+  } | null>(null);
+  const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
 
   useEffect(() => {
     const fetchRates = async () => {
@@ -41,33 +50,93 @@ export default function Home() {
 
   const currencies = rates ? Object.keys(rates) : [];
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (!rates || !cantidad || Number(cantidad) <= 0) return;
-
-    const rateOrigen = rates[origen];
-    const rateDestino = rates[destino];
-    if (!rateOrigen || !rateDestino) return;
 
     setIsConverting(true);
 
-    const amountInUSD = Number(cantidad) / rateOrigen;
-    const finalResult = amountInUSD * rateDestino;
+    try {
+      const res = await fetch("/api/convert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          origen,
+          destino,
+          cantidad: Number(cantidad),
+        }),
+      });
 
-    const simOrigen = simbolosMonedas[origen] ?? "";
-    const simDestino = simbolosMonedas[destino] ?? "";
+      if (!res.ok) throw new Error("No se pudo completar la conversion");
 
-    setResultadoStr(
-      <>
-        <p className="mb-1 text-slate-600">
-          <strong>{simOrigen}{cantidad} {origen}</strong> equivale a:
-        </p>
-        <p className="text-3xl font-bold text-blue-600">
-          {simDestino}{finalResult.toFixed(2)} {destino}
-        </p>
-      </>
-    );
+      const data = (await res.json()) as {
+        resultado: number;
+        transaccion: {
+          id: string;
+          origen: string;
+          destino: string;
+          cantidad: number;
+          resultado: number;
+          timestamp: string;
+        };
+      };
 
-    setIsConverting(false);
+      const simOrigen = simbolosMonedas[origen] ?? "";
+      const simDestino = simbolosMonedas[destino] ?? "";
+
+      setResultadoStr(
+        <>
+          <p className="mb-1 text-slate-600">
+            <strong>{simOrigen}{cantidad} {origen}</strong> equivale a:
+          </p>
+          <p className="text-3xl font-bold text-blue-600">
+            {simDestino}{data.resultado.toFixed(2)} {destino}
+          </p>
+        </>
+      );
+
+      setReceiptData(data.transaccion);
+    } catch {
+      setResultadoStr(
+        <p className="text-red-600">
+          Ocurrio un error al convertir. Intenta nuevamente.
+        </p>,
+      );
+      setReceiptData(null);
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!receiptData) return;
+
+    setIsDownloadingReceipt(true);
+
+    try {
+      const res = await fetch("/api/receipt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(receiptData),
+      });
+
+      if (!res.ok) throw new Error("No se pudo generar el comprobante");
+
+      const pdfBlob = await res.blob();
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `comprobante-${receiptData.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } finally {
+      setIsDownloadingReceipt(false);
+    }
   };
 
   return (
@@ -169,6 +238,17 @@ export default function Home() {
             {resultadoStr && (
               <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-6 text-center">
                 {resultadoStr}
+
+                {receiptData && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadReceipt}
+                    disabled={isDownloadingReceipt}
+                    className="mx-auto mt-4 rounded-xl border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isDownloadingReceipt ? "Generando PDF..." : "Descargar comprobante PDF"}
+                  </button>
+                )}
               </div>
             )}
           </div>
