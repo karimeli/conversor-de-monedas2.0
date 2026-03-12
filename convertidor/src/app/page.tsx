@@ -72,10 +72,22 @@ export default function Home() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden p-4 font-sans md:p-8">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="money-grid" />
+        <p className="ticker-line ticker-line-a">USD/MXN +0.42%  EUR/USD +0.18%  GBP/USD -0.07%</p>
+        <p className="ticker-line ticker-line-b">JPY/USD +0.31%  CAD/USD +0.12%  BRL/USD -0.15%</p>
+        <span className="money-chip money-chip-1">$</span>
+        <span className="money-chip money-chip-2">EUR</span>
+        <span className="money-chip money-chip-3">MXN</span>
+        <span className="money-chip money-chip-4">JPY</span>
+        <span className="money-chip money-chip-5">GBP</span>
+        <span className="money-chip money-chip-6">$</span>
+      </div>
+
       <div className="float-orb pointer-events-none absolute -left-28 -top-24 h-72 w-72 rounded-full bg-amber-300/35 blur-3xl" />
       <div className="float-orb pointer-events-none absolute -bottom-24 -right-28 h-80 w-80 rounded-full bg-teal-300/35 blur-3xl" />
 
-      <section className="relative w-full max-w-2xl rounded-3xl border border-white/60 bg-white/85 p-5 shadow-[0_18px_50px_-18px_rgba(15,23,42,0.35)] backdrop-blur-sm md:p-8">
+      <section className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/60 bg-white/85 p-5 shadow-[0_18px_50px_-18px_rgba(15,23,42,0.35)] backdrop-blur-sm md:p-8">
         <header className="mb-8 flex flex-col gap-3">
           <span className="w-fit rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-teal-800">
             Cambio en vivo
