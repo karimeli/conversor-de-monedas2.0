@@ -12,6 +12,25 @@ const simbolosMonedas: Record<string, string> = {
   'RON': 'lei', 'BGN': 'лв'
 };
 
+const getFilenameFromDisposition = (contentDisposition: string | null, fallbackId: string) => {
+  const fallbackName = `comprobante-${fallbackId}.pdf`;
+
+  if (!contentDisposition) {
+    return fallbackName;
+  }
+
+  const filenameMatch = /filename\*?=(?:UTF-8''|"?)([^";]+)/i.exec(contentDisposition);
+  if (!filenameMatch?.[1]) {
+    return fallbackName;
+  }
+
+  try {
+    return decodeURIComponent(filenameMatch[1].trim());
+  } catch {
+    return filenameMatch[1].trim();
+  }
+};
+
 export default function Home() {
   const [origen, setOrigen] = useState("USD");
   const [destino, setDestino] = useState("MXN");
@@ -134,14 +153,20 @@ export default function Home() {
       }
 
       const pdfBlob = await res.blob();
+      const fileName = getFilenameFromDisposition(
+        res.headers.get("content-disposition"),
+        receiptData.id,
+      );
       const url = window.URL.createObjectURL(pdfBlob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `comprobante-${receiptData.id}.pdf`;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      window.setTimeout(() => {
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }, 1000);
     } catch {
       setReceiptError("No se pudo descargar el PDF. Verifica que el microservicio de comprobantes este activo.");
     } finally {

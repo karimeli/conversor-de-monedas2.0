@@ -10,7 +10,6 @@ export const env = createEnv({
     ANALYTICS_SERVICE_URL: z.string().url().optional(),
     EXCHANGE_API_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
-    RECEIPT_SERVICE_URL: z.string().url().optional(),
   },
 
   /**
@@ -30,7 +29,6 @@ export const env = createEnv({
     ANALYTICS_SERVICE_URL: process.env.ANALYTICS_SERVICE_URL,
     EXCHANGE_API_URL: process.env.EXCHANGE_API_URL,
     NODE_ENV: process.env.NODE_ENV,
-    RECEIPT_SERVICE_URL: process.env.RECEIPT_SERVICE_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
